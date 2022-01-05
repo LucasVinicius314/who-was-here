@@ -1,2 +1,5 @@
-# who-was-here
- 
+# pir
+
+```bash
+ts-node src/index.ts
+```
