@@ -17,6 +17,7 @@ dependencies:
   json_annotation: ^4.4.0
   provider: ^6.0.2
   intl: ^0.17.0
+  material_design_icons_flutter: ^5.0.6595
 
 dev_dependencies:
   flutter_test:
