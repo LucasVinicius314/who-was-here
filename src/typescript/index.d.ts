@@ -5,6 +5,7 @@ declare global {
       DATABASE_URL: string
       COMPATH: string
       BAUDRATE: string
+      PORT: string
     }
   }
 }
