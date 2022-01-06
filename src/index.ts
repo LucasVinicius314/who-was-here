@@ -9,6 +9,7 @@ import { Model } from 'sequelize/dist'
 import { Server as SocketIO } from 'socket.io'
 import audioLoader from 'audio-loader'
 import audioPlay from 'audio-play'
+import { ipLookup } from './utils/iplookup'
 
 dotenv.config()
 
@@ -64,8 +65,9 @@ const setup = async () => {
 
   io.engine.on('connection_error', console.error)
 
-  app.listen(port, () => {
+  app.listen(port, async () => {
     console.info(`Listening on port ${port}`)
+    console.info(`Address: ${await ipLookup()}:${port}/`)
   })
 }
 
