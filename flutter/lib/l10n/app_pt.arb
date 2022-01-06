@@ -1,0 +1,12 @@
+{
+  "applyChanges": "Aplicar mudanças",
+  "connectionErrorMessage": "Algo deu errado durante a conexão.",
+  "item": "item",
+  "items": "itens",
+  "listingAllEvents": "Listando todos os eventos.",
+  "loading": "Carregando...",
+  "newEventDetected": "Novo evento detectado.",
+  "settings": "Configurações",
+  "socketConnected": "Socket conectado.",
+  "somethingWentWrong": "Algo deu errado."
+}

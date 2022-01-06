@@ -1,4 +1,4 @@
-package com.example.who_was_here
+package com.sure.who_was_here
 
 import io.flutter.embedding.android.FlutterActivity
 

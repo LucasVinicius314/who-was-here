@@ -2,9 +2,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:socket_io_client/socket_io_client.dart' as io;
 import 'package:who_was_here/constants/constants.dart';
 import 'package:who_was_here/models/log.dart';
+import 'package:who_was_here/utils/services/localization.dart';
 import 'package:who_was_here/utils/services/shared_preferences.dart';
 import 'package:who_was_here/utils/show_default_snackbar.dart';
 import 'package:who_was_here/widgets/settings_widget.dart';
@@ -26,6 +28,8 @@ class _MainPageState extends State<MainPage> {
   Future<void> _settings() async {
     final ans = await showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
+      clipBehavior: Clip.antiAliasWithSaveLayer,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
@@ -54,7 +58,7 @@ class _MainPageState extends State<MainPage> {
 
       showDefaultSnackBar(
         context: context,
-        content: 'Something went wrong while attempting to connect.',
+        content: Localization.string(context).connectionErrorMessage,
       );
     });
 
@@ -63,7 +67,10 @@ class _MainPageState extends State<MainPage> {
         print(data);
       }
 
-      showDefaultSnackBar(content: 'Something went wrong.', context: context);
+      showDefaultSnackBar(
+        context: context,
+        content: Localization.string(context).somethingWentWrong,
+      );
     });
 
     socket.onConnect((data) {
@@ -71,7 +78,10 @@ class _MainPageState extends State<MainPage> {
         print('socket connected');
       }
 
-      showDefaultSnackBar(content: 'Socket connected.', context: context);
+      showDefaultSnackBar(
+        context: context,
+        content: Localization.string(context).socketConnected,
+      );
 
       _socket?.emit('all');
     });
@@ -79,7 +89,10 @@ class _MainPageState extends State<MainPage> {
     socket.on('all', (data) {
       final logs = (data as Iterable<dynamic>).map((e) => Log.fromJson(e));
 
-      showDefaultSnackBar(content: 'Listing all events.', context: context);
+      showDefaultSnackBar(
+        context: context,
+        content: Localization.string(context).listingAllEvents,
+      );
 
       setState(() {
         _logs = logs.toList();
@@ -89,7 +102,10 @@ class _MainPageState extends State<MainPage> {
     socket.on('new', (data) {
       final log = Log.fromJson(data);
 
-      showDefaultSnackBar(content: 'New event detected.', context: context);
+      showDefaultSnackBar(
+        context: context,
+        content: Localization.string(context).newEventDetected,
+      );
 
       _logs.insert(0, log);
 
@@ -121,7 +137,42 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(Constants.appName),
+        title: ListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Text(
+            Constants.appName,
+            style: TextStyle(
+              color: Theme.of(context).primaryTextTheme.headline6?.color,
+            ),
+          ),
+          subtitle: FutureBuilder<PackageInfo>(
+            future: PackageInfo.fromPlatform(),
+            builder: (context, snapshot) {
+              final caption = Theme.of(context).primaryTextTheme.caption;
+
+              if (snapshot.hasError) {
+                return Text(
+                  Localization.string(context).somethingWentWrong,
+                  style: caption,
+                );
+              }
+
+              if (snapshot.connectionState == ConnectionState.done) {
+                final data = snapshot.data!;
+
+                return Text(
+                  '${data.appName} ${data.version}+${data.buildNumber}',
+                  style: caption,
+                );
+              }
+
+              return Text(
+                Localization.string(context).loading,
+                style: caption,
+              );
+            },
+          ),
+        ),
         actions: [
           IconButton(
             onPressed: _settings,
@@ -135,7 +186,7 @@ class _MainPageState extends State<MainPage> {
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Text(
-            '${DateFormat('yMMMd').format(DateTime.now())} - ${_logs.length} item${_logs.length == 1 ? '' : 's'}',
+            '${Localization.formatDateDateShortMonth(context, DateTime.now())} - ${_logs.length} ${_logs.length == 1 ? Localization.string(context).item : Localization.string(context).items}',
           ),
         ),
       ),
@@ -150,7 +201,7 @@ class _MainPageState extends State<MainPage> {
             child: ListTile(
               title: Text(log.tag),
               subtitle: Text(
-                DateFormat().format(log.getCreatedAt),
+                Localization.dateFormat(context).format(log.getCreatedAt),
                 style: Theme.of(context).textTheme.caption,
               ),
               leading: log.getCreatedAt.hour >= 18 || log.getCreatedAt.hour < 5

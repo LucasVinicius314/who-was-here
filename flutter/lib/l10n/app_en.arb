@@ -1,0 +1,42 @@
+{
+  "applyChanges": "Apply changes",
+  "@applyChanges": {
+    "description": ""
+  },
+  "connectionErrorMessage": "Something went wrong while attempting to connect.",
+  "@connectionErrorMessage": {
+    "description": ""
+  },
+  "item": "item",
+  "@item": {
+    "description": ""
+  },
+  "items": "items",
+  "@items": {
+    "description": ""
+  },
+  "listingAllEvents": "Listing all events.",
+  "@listingAllEvents": {
+    "description": ""
+  },
+  "loading": "Loading...",
+  "@loading": {
+    "description": ""
+  },
+  "newEventDetected": "New event detected.",
+  "@newEventDetected": {
+    "description": ""
+  },
+  "settings": "Settings",
+  "@settings": {
+    "description": ""
+  },
+  "socketConnected": "Socket connected.",
+  "@socketConnected": {
+    "description": ""
+  },
+  "somethingWentWrong": "Something went wrong.",
+  "@somethingWentWrong": {
+    "description": ""
+  }
+}
