@@ -1,6 +1,6 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:socket_io_client/socket_io_client.dart' as io;
@@ -10,6 +10,8 @@ import 'package:who_was_here/utils/services/localization.dart';
 import 'package:who_was_here/utils/services/shared_preferences.dart';
 import 'package:who_was_here/utils/show_default_snackbar.dart';
 import 'package:who_was_here/widgets/settings_widget.dart';
+
+final messaging = FirebaseMessaging.instance;
 
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
@@ -123,6 +125,59 @@ class _MainPageState extends State<MainPage> {
 
     Future.delayed(Duration.zero, () async {
       await _setupSocket();
+
+      await FirebaseMessaging.instance.subscribeToTopic('new-event');
+
+      FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+        if (kDebugMode) {
+          print('Got a message whilst in the foreground!');
+          print('Message data: ${message.data}');
+
+          if (message.notification != null) {
+            print(
+              'Message also contained a notification: ${message.notification}',
+            );
+          }
+        }
+
+        if (mounted) {
+          await showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: const Text('Firebase notification'),
+                content: Text(message.data.toString()),
+              );
+            },
+          );
+        }
+      });
+
+      FirebaseMessaging.onMessageOpenedApp
+          .listen((RemoteMessage message) async {
+        if (kDebugMode) {
+          print('Got a message whilst in the foreground!');
+          print('Message data: ${message.data}');
+
+          if (message.notification != null) {
+            print(
+              'Message also contained a notification: ${message.notification}',
+            );
+          }
+        }
+
+        if (mounted) {
+          await showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: const Text('AAAAAAAAAAAAAAAAAAAAAA'),
+                content: Text(message.data.toString()),
+              );
+            },
+          );
+        }
+      });
     });
   }
 

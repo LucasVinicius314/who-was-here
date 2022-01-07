@@ -1,5 +1,6 @@
 import * as SerialPort from 'serialport'
 import * as Server from 'http'
+import * as admin from 'firebase-admin'
 import * as dotenv from 'dotenv'
 
 import { models, sequelize } from './services/sequelize'
@@ -28,6 +29,10 @@ const setup = async () => {
     .then(() => console.log('Database sync ok'))
     .catch(console.log)
 
+  admin.initializeApp({
+    credential: admin.credential.cert(require('../service-account.json')),
+  })
+
   const app = Server.createServer()
 
   const io = new SocketIO(app, {
@@ -47,6 +52,33 @@ const setup = async () => {
     const log = await models.Log.create<Model<Log>>({ tag: 'pir sensor' })
 
     io.emit('new', log)
+
+    admin.messaging().send({
+      topic: 'new-event',
+      data: {
+        message: 'New event detected.',
+      },
+      android: {
+        priority: 'high',
+        notification: {
+          body: 'New event detected.',
+          defaultSound: true,
+          priority: 'max',
+        },
+      },
+      apns: {
+        payload: {
+          aps: {
+            contentAvailable: true,
+          },
+        },
+        headers: {
+          'apns-push-type': 'background',
+          'apns-priority': '5', // Must be `5` when `contentAvailable` is set to true.
+          'apns-topic': 'io.flutter.plugins.firebase.messaging', // bundle identifier
+        },
+      },
+    })
   })
 
   console.info(`Listening to ${comPath}, baud rate ${baudRate}`)
